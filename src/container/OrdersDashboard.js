@@ -1,4 +1,3 @@
-"use client";
 import {
   Avatar,
   Box,
@@ -20,7 +19,7 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import React, {useState } from "react";
+import React, { useState } from "react";
 
 // icons
 import FoodBankOutlinedIcon from "@mui/icons-material/FoodBankOutlined";
@@ -35,9 +34,10 @@ import CheckOutlinedIcon from "@mui/icons-material/CheckOutlined";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import { useDispatch, useSelector } from "react-redux";
 import { addProduct, updateProductStatus } from "../storage/orderReducer";
-import { printPage } from "../utils/helper";
+import { colorCategory, printPage } from "../utils/helper";
 import status from "../data/status";
 import { orderedProducts } from "../data/orderData";
+import ProductEdit from "../components/ProductEdit";
 
 const generateNextId = (products) => {
   const maxId = Math.max(...products.map((product) => product.id), 0);
@@ -50,7 +50,17 @@ const OrdersDashboard = () => {
   const dispatch = useDispatch();
   const [searchValue, setSearchValue] = useState("");
   const [missingPopUp, setMissingPopUp] = useState(false);
+  const [editPopUp, setEditPopUp] = useState(false);
   const [productValue, setProductValue] = useState(null);
+
+  const handleEditOpen = (product) => {
+    setProductValue(product);
+    setEditPopUp(true);
+  };
+  const handleEditClose = () => {
+    setEditPopUp(false);
+    setProductValue(null);
+  };
 
   const handleMissingOpen = (product) => {
     setProductValue(product);
@@ -89,19 +99,6 @@ const OrdersDashboard = () => {
     });
   };
 
-  const colorCategory = (value) => {
-    switch (value) {
-      case `${status.Missing}`:
-        return "warning";
-      case `${status.MissingUrgent}`:
-        return "error";
-      case `${status.MissingProduct}`:
-        return "error";
-      default:
-        return "success";
-    }
-  };
-
   return (
     <Box p={4} mx={4}>
       {productValue && missingPopUp && (
@@ -110,7 +107,7 @@ const OrdersDashboard = () => {
           open={missingPopUp}
           maxWidth="xs"
         >
-          <DialogTitle id="dialog-title">
+          <DialogTitle id="dialog-title-missing">
             Missing Product
             <IconButton
               aria-label="close"
@@ -164,6 +161,72 @@ const OrdersDashboard = () => {
           </DialogActions>
         </Dialog>
       )}
+      {productValue && editPopUp && (
+        <Dialog
+          aria-labelledby="edit-Procuct-check"
+          open={editPopUp}
+          maxWidth="md"
+        >
+          <DialogTitle id="dialog-title-edit">
+            <IconButton
+              aria-label="close"
+              onClick={handleEditClose}
+              sx={{
+                position: "absolute",
+                right: 8,
+                top: 8,
+                color: (theme) => theme.palette.grey[500],
+              }}
+              size="small"
+            >
+              <CloseOutlinedIcon />
+            </IconButton>
+          </DialogTitle>
+          <DialogContent>
+            <Typography  noWrap sx={{ maxWidth: "sm" }} variant="h5">
+             <strong> {productValue?.name}</strong>
+            </Typography>{" "}
+            <Typography gutterBottom noWrap sx={{ maxWidth: "sm" }}>
+              {productValue?.brand}
+            </Typography>{" "}
+            <ProductEdit data={productValue} />
+          </DialogContent>
+          <DialogActions>
+            <Button
+              onClick={() => {
+                handleStatusUpdate(productValue.id, status.Missing);
+                handleEditClose();
+              }}
+              sx={{
+                borderRadius: "36px",
+                padding: "4px 24px",
+                textTransform: "none",
+              }}
+              size="small"
+              variant="outlined"
+              color="primary"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                handleEditClose();
+              }}
+              sx={{
+                borderRadius: "36px",
+                padding: "4px 24px",
+                textTransform: "none",
+              }}
+              size="small"
+              variant="contained"
+              color="primary"
+            >
+              Send
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
+
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <Paper elevation={0} sx={{ p: 2 }} variant="outlined">
@@ -301,10 +364,10 @@ const OrdersDashboard = () => {
                   elevation={0}
                   sx={{
                     borderRadius: "12px",
-                    borderRight:"none",
-                    borderLeft:"none",
-                    maxHeight:"70vh",
-                    maxWidth:"100vw",
+                    borderRight: "none",
+                    borderLeft: "none",
+                    maxHeight: "70vh",
+                    maxWidth: "100vw",
                   }}
                   className="custom-scrollbar"
                 >
@@ -380,8 +443,8 @@ const OrdersDashboard = () => {
                                   handleStatusUpdate(row?.id, status.Approved)
                                 }
                                 color={
-                                  row?.status === status.Approved
-                                    ? "success"
+                                  row?.status
+                                    ? colorCategory(row.status)
                                     : "inherit"
                                 }
                               >
@@ -400,7 +463,7 @@ const OrdersDashboard = () => {
                               </IconButton>
 
                               <Button
-                                onClick={() => alert("Edit")}
+                                onClick={() => handleEditOpen(row)}
                                 sx={{ textTransform: "capitalize" }}
                                 variant="text"
                                 color="inherit"
