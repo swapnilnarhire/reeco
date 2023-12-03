@@ -1,24 +1,53 @@
-import logo from './logo.svg';
-import './App.css';
+import { Box, Typography, Link } from "@mui/material";
+import HeaderAppBar from "./components/HeaderAppBar";
+import OrdersDashboard from "./container/OrdersDashboard";
+import FeatureHeader from "./components/FeatureHeader";
+import React, { useEffect } from "react";
+import "./App.css";
+
+function Copyright() {
+  return (
+    <Typography variant="body2" color="text.secondary" align="center">
+      {"Copyright © "}
+      <Link color="inherit" href="https://mui.com/">
+        Your Website
+      </Link>{" "}
+      {new Date().getFullYear()}
+      {"."}
+    </Typography>
+  );
+}
 
 function App() {
+  useEffect(() => {
+    const checkScrollHeight = () => {
+      const boxElement = document.getElementById("custom-scrollbar-box");
+      if (boxElement) {
+        const shouldApplyCustomScrollbar =
+          boxElement.scrollHeight >= window.innerHeight;
+        if (shouldApplyCustomScrollbar) {
+          boxElement.classList.add("custom-scrollbar");
+        } else {
+          boxElement.classList.remove("custom-scrollbar");
+        }
+      }
+    };
+
+    window.addEventListener("scroll", checkScrollHeight);
+
+    checkScrollHeight();
+
+    return () => {
+      window.removeEventListener("scroll", checkScrollHeight);
+    };
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Box id="custom-scrollbar-box" className="custom-scrollbar">
+      <HeaderAppBar />
+      <FeatureHeader />
+      <OrdersDashboard />
+    </Box>
   );
 }
 
