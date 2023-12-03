@@ -18,8 +18,14 @@ export const colorCategory = (value) => {
       return "success";
     case `${status.QuantityUpdated}`:
       return "success";
+    case `${status.QuantityNotSame}`:
+      return "warning";
+    case `${status.PriceNotSame}`:
+      return "warning";
+    case `${status.PriceUpdated}`:
+      return "success";
 
     default:
-      return "inherit";
+      return "default";
   }
 };

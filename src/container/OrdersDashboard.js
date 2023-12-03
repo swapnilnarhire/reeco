@@ -33,7 +33,11 @@ import PrintOutlinedIcon from "@mui/icons-material/PrintOutlined";
 import CheckOutlinedIcon from "@mui/icons-material/CheckOutlined";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import { useDispatch, useSelector } from "react-redux";
-import { addProduct, updateProductStatus } from "../storage/orderReducer";
+import {
+  addProduct,
+  editProduct,
+  updateProductStatus,
+} from "../storage/orderReducer";
 import { colorCategory, printPage } from "../utils/helper";
 import status from "../data/status";
 import { orderedProducts } from "../data/orderData";
@@ -52,6 +56,15 @@ const OrdersDashboard = () => {
   const [missingPopUp, setMissingPopUp] = useState(false);
   const [editPopUp, setEditPopUp] = useState(false);
   const [productValue, setProductValue] = useState(null);
+  const [editedProduct, setEditedProduct] = useState(null);
+
+  const handleEditProduct = () => {
+    if (editedProduct) {
+      console.log(editedProduct);
+      dispatch(editProduct(editedProduct));
+      handleEditClose();
+    }
+  };
 
   const handleEditOpen = (product) => {
     setProductValue(product);
@@ -59,6 +72,7 @@ const OrdersDashboard = () => {
   };
   const handleEditClose = () => {
     setEditPopUp(false);
+    setEditedProduct(null);
     setProductValue(null);
   };
 
@@ -183,18 +197,20 @@ const OrdersDashboard = () => {
             </IconButton>
           </DialogTitle>
           <DialogContent>
-            <Typography  noWrap sx={{ maxWidth: "sm" }} variant="h5">
-             <strong> {productValue?.name}</strong>
+            <Typography noWrap sx={{ maxWidth: "sm" }} variant="h5">
+              <strong> {productValue?.name}</strong>
             </Typography>{" "}
             <Typography gutterBottom noWrap sx={{ maxWidth: "sm" }}>
               {productValue?.brand}
             </Typography>{" "}
-            <ProductEdit data={productValue} />
+            <ProductEdit
+              data={productValue}
+              setEditedProduct={setEditedProduct}
+            />
           </DialogContent>
           <DialogActions>
             <Button
               onClick={() => {
-                handleStatusUpdate(productValue.id, status.Missing);
                 handleEditClose();
               }}
               sx={{
@@ -210,7 +226,7 @@ const OrdersDashboard = () => {
             </Button>
             <Button
               onClick={() => {
-                handleEditClose();
+                handleEditProduct();
               }}
               sx={{
                 borderRadius: "36px",
@@ -431,46 +447,50 @@ const OrdersDashboard = () => {
                             )}
                           </TableCell>
                           <TableCell
-                            align="right"
                             style={{ backgroundColor: "#eee" }}
+                            align="right"
                           >
-                            <Box
-                            // justifyContent={"space-between"}
-                            // display="flex"
-                            >
-                              <IconButton
-                                onClick={() =>
-                                  handleStatusUpdate(row?.id, status.Approved)
-                                }
-                                color={
-                                  row?.status
-                                    ? colorCategory(row.status)
-                                    : "inherit"
-                                }
-                              >
-                                <CheckOutlinedIcon />
-                              </IconButton>
-
-                              <IconButton
-                                onClick={() => handleMissingOpen(row)}
-                                color={
-                                  row?.status
-                                    ? colorCategory(row.status)
-                                    : "inherit"
-                                }
-                              >
-                                <CloseOutlinedIcon />
-                              </IconButton>
-
-                              <Button
-                                onClick={() => handleEditOpen(row)}
-                                sx={{ textTransform: "capitalize" }}
-                                variant="text"
-                                color="inherit"
-                              >
-                                Edit
-                              </Button>
-                            </Box>
+                            <Grid container spacing={2}>
+                              <Grid item xs={4}>
+                                {" "}
+                                <IconButton
+                                  onClick={() =>
+                                    handleStatusUpdate(row?.id, status.Approved)
+                                  }
+                                  color={
+                                    row?.status
+                                      ? colorCategory(row.status)
+                                      : "inherit"
+                                  }
+                                >
+                                  <CheckOutlinedIcon />
+                                </IconButton>
+                              </Grid>
+                              <Grid item xs={4}>
+                                {" "}
+                                <IconButton
+                                  onClick={() => handleMissingOpen(row)}
+                                  color={
+                                    row?.status
+                                      ? colorCategory(row.status)
+                                      : "inherit"
+                                  }
+                                >
+                                  <CloseOutlinedIcon />
+                                </IconButton>
+                              </Grid>
+                              <Grid item xs={4}>
+                                {" "}
+                                <Button
+                                  onClick={() => handleEditOpen(row)}
+                                  sx={{ textTransform: "capitalize" }}
+                                  variant="text"
+                                  color="inherit"
+                                >
+                                  Edit
+                                </Button>
+                              </Grid>
+                            </Grid>
                           </TableCell>
                         </TableRow>
                       ))}

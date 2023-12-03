@@ -11,43 +11,75 @@ import {
 import React, { useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
+import status from "../data/status";
 
 const ProductEdit = (props) => {
-  const { data } = props;
+  const { data, setEditedProduct } = props;
   const [price, setPrice] = useState(data?.price || 0);
   const [quantity, setQuantity] = useState(data?.quantity || 0);
-  const [selectedChip, setSelectedChip] = useState(null);
+  const [selectedChip, setSelectedChip] = useState(data?.status || null);
   const [total, setTotal] = useState(data?.price * data?.quantity || 0);
 
-  const totalValue=(price,quantity)=>{
+  const totalValue = (price, quantity) => {
     setTotal(price * quantity);
-  }
+  };
 
   const handleChipClick = (chip) => {
     setSelectedChip(chip === selectedChip ? null : chip);
+    setEditedProduct({
+      productId: data.id,
+      price: price,
+      quantity: quantity,
+      newStatus: chip === selectedChip ? null : chip,
+    });
   };
 
   const handlePriceChange = (event) => {
+    
     setPrice(event.target.value);
-    totalValue(event.target.value,quantity)
+    totalValue(event.target.value, quantity);
+    setEditedProduct({
+      productId: data.id,
+      price: event.target.value,
+      quantity: quantity,
+      newStatus: selectedChip !== null ? selectedChip : status.PriceUpdated,
+    });
   };
 
   const handleQuantityIncrement = () => {
     setQuantity(quantity + 1);
-    totalValue(price,quantity+1)
+    totalValue(price, quantity + 1);
+    setEditedProduct({
+      productId: data.id,
+      price: price,
+      quantity: quantity + 1,
+      newStatus: selectedChip !== null ? selectedChip : status.QuantityUpdated,
+    });
   };
 
   const handleQuantityDecrement = () => {
     // Ensure that the quantity does not go below 0
     setQuantity(Math.max(0, quantity - 1));
-    totalValue(price,quantity-1)
+    totalValue(price, quantity - 1);
+    setEditedProduct({
+      productId: data.id,
+      price: price,
+      quantity: quantity - 1,
+      newStatus: selectedChip !== null ? selectedChip : status.QuantityUpdated,
+    });
   };
 
   const handleQuantityChange = (event) => {
     // Ensure that the entered value is not less than 0
     const inputValue = Math.max(0, event.target.value);
     setQuantity(inputValue);
-    totalValue(price,inputValue)
+    totalValue(price, inputValue);
+    setEditedProduct({
+      productId: data.id,
+      price: price,
+      quantity: inputValue,
+      newStatus: selectedChip !== null ? selectedChip : status.QuantityUpdated,
+    });
   };
 
   return (
@@ -73,7 +105,7 @@ const ProductEdit = (props) => {
                 id="price"
                 value={price}
                 onChange={handlePriceChange}
-                sx={{ maxWidth: "200px" }}
+                sx={{ maxWidth: "200px", minWidth: "200px" }}
                 size="small"
               />
               <Typography mx={2}>/6*1LB</Typography>
@@ -92,7 +124,7 @@ const ProductEdit = (props) => {
                 id="quantity"
                 value={quantity}
                 onChange={handleQuantityChange}
-                sx={{ maxWidth: "200px" }}
+                sx={{ maxWidth: "200px", minWidth: "200px" }}
                 size="small"
                 inputProps={{
                   min: 0, // Set the minimum value for the input

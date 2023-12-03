@@ -37,13 +37,28 @@ const orderSlice = createSlice({
     approveAllProducts: (state) => {
       // Set the status of all products to "Approved"
       state.products.forEach((product) => {
-        product.status = "Approved";
+        product.status = status.Approved;
       });
+    },
+    editProduct: (state, action) => {
+      const { productId, price, quantity, newStatus } = action.payload;
+      console.log(action.payload);
+      const product = state.products.find((p) => p.id === productId);
+      if (product) {
+        product.status =
+          product.price !== price && product.quantity !== quantity
+            ? status.QuantityPriceUpdated
+            : newStatus;
+        // Update the price and quantity of the specified product
+        product.price = price;
+        product.quantity = quantity;
+        state.totalPrice = calculateTotalPrice(state.products);
+      }
     },
     resetOrder: (state) => {
       // Reset the state to its initial values
-      state.products =[...orderedProducts];
-      state.totalPrice =calculateTotalPrice(orderedProducts);
+      state.products = [...orderedProducts];
+      state.totalPrice = calculateTotalPrice(orderedProducts);
     },
   },
 });
@@ -53,6 +68,7 @@ export const {
   updateProductStatus,
   approveAllProducts,
   resetOrder,
+  editProduct,
 } = orderSlice.actions;
 
 export default orderSlice.reducer;
