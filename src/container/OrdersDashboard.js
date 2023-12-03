@@ -275,12 +275,12 @@ const OrdersDashboard = () => {
                     sx={{
                       borderRadius: "36px",
                       padding: "4px 24px",
-                      textTransform: "capitalize",
+                      textTransform: "none",
                     }}
                     size="small"
                     onClick={handleAddProducts}
                   >
-                    Add Item
+                    Add item
                   </Button>
                   <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
                     <IconButton
@@ -301,6 +301,10 @@ const OrdersDashboard = () => {
                   elevation={0}
                   sx={{
                     borderRadius: "12px",
+                    borderRight:"none",
+                    borderLeft:"none",
+                    maxHeight:"70vh",
+                    maxWidth:"100vw",
                   }}
                   className="custom-scrollbar"
                 >

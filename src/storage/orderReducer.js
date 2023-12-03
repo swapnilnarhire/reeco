@@ -35,12 +35,15 @@ const orderSlice = createSlice({
       }
     },
     approveAllProducts: (state) => {
+      // Set the status of all products to "Approved"
       state.products.forEach((product) => {
-        product.status = status.Approved;
+        product.status = "Approved";
       });
     },
     resetOrder: (state) => {
-      state.products = [];
+      // Reset the state to its initial values
+      state.products =[...orderedProducts];
+      state.totalPrice =calculateTotalPrice(orderedProducts);
     },
   },
 });
